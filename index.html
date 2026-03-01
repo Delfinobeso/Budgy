@@ -131,7 +131,7 @@
 
   /* DASHBOARD */
   #dashScreen{justify-content:flex-start;overflow-y:auto;overflow-x:hidden;padding:0;-webkit-overflow-scrolling:touch;}
-  .dash-inner{width:100%;max-width:480px;padding:calc(var(--sat, 0px) + 16px) 18px calc(env(safe-area-inset-bottom, 0px) + 100px);}
+  .dash-inner{width:100%;max-width:480px;padding:calc(var(--sat, 0px) + 16px) 18px calc(max(env(safe-area-inset-bottom, 34px), 34px) + 76px);}
   .dash-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
   .dash-logo{font-family:'Caudex',serif;font-weight:700;font-size:1.4rem;letter-spacing:-.5px;display:flex;align-items:center;gap:8px;}
   .dash-logo-mark{width:26px;height:26px;border-radius:7px;background:var(--accent1);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:5px;}
@@ -230,7 +230,13 @@
   .exp-empty-icon{margin-bottom:8px;opacity:.35;display:flex;justify-content:center;}
   .exp-empty-icon svg{width:32px;height:32px;stroke:var(--text2);fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round;}
   .exp-empty-txt{font-family:'DM Sans',sans-serif;font-size:.84rem;line-height:1.5;}
-  .exp-row{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:11px 14px;display:flex;align-items:center;gap:12px;animation:fadeUp .3s cubic-bezier(.16,1,.3,1) both;}
+  .exp-row-wrap{position:relative;border-radius:14px;overflow:hidden;}
+  .exp-swipe-left{position:absolute;right:0;top:0;bottom:0;width:72px;display:flex;align-items:center;justify-content:center;background:var(--accent1);border-radius:0 14px 14px 0;pointer-events:none;opacity:0;}
+  .exp-swipe-left svg{width:20px;height:20px;min-width:20px;min-height:20px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .exp-swipe-right{position:absolute;left:0;top:0;bottom:0;width:72px;display:flex;align-items:center;justify-content:center;background:var(--red);border-radius:14px 0 0 14px;pointer-events:none;opacity:0;}
+  .exp-swipe-right svg{width:20px;height:20px;min-width:20px;min-height:20px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .exp-row{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:11px 14px;display:flex;align-items:center;gap:12px;animation:fadeUp .3s cubic-bezier(.16,1,.3,1) both;position:relative;z-index:1;transition:transform .25s cubic-bezier(.16,1,.3,1);touch-action:pan-y;user-select:none;-webkit-user-select:none;}
+  .exp-row.dragging{transition:none;}
   .exp-em{width:28px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
   .exp-em svg{width:18px;height:18px;stroke:var(--text2);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
   .exp-info{flex:1;min-width:0;}
@@ -244,7 +250,7 @@
   .exp-del svg{width:15px;height:15px;stroke:var(--red);fill:none;stroke-width:2;stroke-linecap:round;}
 
   /* FAB */
-  .fab{position:fixed;bottom:calc(env(safe-area-inset-bottom, 0px) + 24px);left:50%;translate:-50% 0;width:56px;height:56px;border-radius:18px;background:var(--accent1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px var(--shadow);transition:opacity .2s cubic-bezier(.34,1.56,.64,1),scale .2s cubic-bezier(.34,1.56,.64,1);z-index:100;scale:1;}
+  .fab{position:fixed;bottom:max(env(safe-area-inset-bottom, 34px), 34px);left:50%;translate:-50% 0;width:56px;height:56px;border-radius:18px;background:var(--accent1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px var(--shadow);transition:opacity .2s cubic-bezier(.34,1.56,.64,1),scale .2s cubic-bezier(.34,1.56,.64,1);z-index:100;scale:1;}
   .fab svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
   .fab:active{transform:scale(.88);}
   .fab.hidden{scale:0;opacity:0;pointer-events:none;}
@@ -292,7 +298,7 @@
   .modal-overlay.open{opacity:1;pointer-events:all;}
   .modal{width:100%;max-width:480px;background:var(--bg2);border-radius:28px 28px 0 0;border:1px solid var(--border2);border-bottom:none;padding:20px 20px calc(env(safe-area-inset-bottom,0px) + 28px);transform:translateY(100%);transition:transform .4s cubic-bezier(.16,1,.3,1);box-shadow:0 -8px 32px var(--shadow2);max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
   .modal-overlay.open .modal{transform:translateY(0);}
-  .modal-handle{width:40px;height:4px;background:var(--bg5);border-radius:4px;margin:0 auto 20px;}
+  .modal-handle{width:44px;height:5px;background:rgba(255,255,255,0.25);border-radius:4px;margin:0 auto 18px;cursor:pointer;}
   .modal-title{font-family:'Caudex',serif;font-weight:700;font-size:1.2rem;margin-bottom:0;}
   .modal-title span{color:var(--accent1);}
   .form-row{margin-bottom:14px;}
@@ -603,7 +609,7 @@
 <!-- EXPENSE MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
   <div class="modal">
-    <div class="modal-handle" onclick="closeModal()" style="cursor:pointer;margin-bottom:4px;width:40px;height:4px;background:var(--bg5);border-radius:4px;margin:0 auto 16px;display:block;"></div>
+    <div class="modal-handle" onclick="closeModal()"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
       <div class="modal-title" style="margin-bottom:0;">Nuova <span id="modalTitleCat">spesa</span></div>
       <button onclick="closeModal()" style="background:var(--bg3);border:none;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
@@ -615,7 +621,7 @@
     <div class="form-row"><label class="form-label">Categoria</label><div class="cat-picker" id="catPicker"></div></div>
     <div class="form-row"><label class="form-label">Data</label><input class="form-input" id="fDate" type="date"></div>
     <div class="form-row"><div class="toggle-row"><span class="toggle-lbl"><svg viewBox="0 0 24 24"><path d="M17 2.1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 21.9l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Spesa ricorrente</span><label class="toggle"><input type="checkbox" id="fRecurring"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div></div>
-    <button class="btn-primary" style="margin-top:8px;" onclick="saveExpense()">Aggiungi spesa</button>
+    <button class="btn-primary" id="modalSaveBtn" style="margin-top:8px;" onclick="saveExpense()">Aggiungi spesa</button>
   </div>
 </div>
 
@@ -755,7 +761,7 @@
 <!-- CLOSE MONTH MODAL -->
 <div class="modal-overlay" id="closeMonthOverlay" onclick="handleCloseOverlayClick(event)">
   <div class="modal">
-    <div class="modal-handle" onclick="document.getElementById('closeMonthOverlay').classList.remove('open')" style="cursor:pointer;width:40px;height:4px;background:var(--bg5);border-radius:4px;margin:0 auto 16px;display:block;"></div>
+    <div class="modal-handle" onclick="document.getElementById('closeMonthOverlay').classList.remove('open')"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
       <div class="modal-title" style="margin-bottom:0;">Chiudi <span>mese</span></div>
       <button onclick="document.getElementById('closeMonthOverlay').classList.remove('open')" style="background:var(--bg3);border:none;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
@@ -863,7 +869,7 @@ function buildConfirm(){const active=cats.filter(c=>c.pct>0);document.getElement
 function finish(){const data={income,cats:cats.filter(c=>c.pct>0),createdAt:new Date().toISOString()};localStorage.setItem('bm_setup',JSON.stringify(data));show('dashScreen');buildDash();}
 
 // ── DASHBOARD STATE ──
-let expenses=[],setupData=null,modalPreselectedCat=null,catsExpanded=false;
+let expenses=[],setupData=null,modalPreselectedCat=null,catsExpanded=false,editingExpenseId=null;
 let currentYear=new Date().getFullYear(),currentMonth=new Date().getMonth();
 const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 let activeTab='budget';
@@ -990,11 +996,13 @@ function renderExpenseListHome(list){
     const cat=setupData.cats.find(c=>c.id===exp.catId)||{id:'unknown',name:'Altro'};
     const d=new Date(exp.date);
     const dateStr=d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
-    const row=document.createElement('div');
-    row.className='exp-row';
-    const delBtn=past?'':`<button class="exp-del" onclick="deleteExpense('${exp.id}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
-    row.innerHTML='<div class="exp-em">'+catIcon(cat.id)+'</div><div class="exp-info">'+(exp.desc?'<div class="exp-desc">'+exp.desc+'</div>':'')+'<div class="exp-date">'+cat.name+' · '+dateStr+(exp.recurring?' · ↻':'')+'</div></div><span class="exp-amt">-€ '+fmt2(exp.amount)+'</span>'+delBtn;
-    el.appendChild(row);
+    const wrap=document.createElement('div');wrap.className='exp-row-wrap';
+    wrap.innerHTML='<div class="exp-swipe-right"><svg width="20" height="20" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div><div class="exp-swipe-left"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>';
+    const row=document.createElement('div');row.className='exp-row';
+    row.innerHTML='<div class="exp-em">'+catIcon(cat.id)+'</div><div class="exp-info">'+(exp.desc?'<div class="exp-desc">'+exp.desc+'</div>':'')+'<div class="exp-date">'+cat.name+' · '+dateStr+(exp.recurring?' · ↻':'')+'</div></div><span class="exp-amt">-€ '+fmt2(exp.amount)+'</span>';
+    wrap.appendChild(row);
+    el.appendChild(wrap);
+    initExpSwipe(wrap, exp.id, past);
   });
   if(sorted.length>5){
     const more=document.createElement('button');
@@ -1020,9 +1028,13 @@ function renderExpenseList(list){
     const cat=setupData.cats.find(c=>c.id===exp.catId)||{id:'unknown',name:'Altro'};
     const d=new Date(exp.date);
     const dateStr=d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
+    const wrap2=document.createElement('div');wrap2.className='exp-row-wrap';
+    wrap2.innerHTML='<div class="exp-swipe-right"><svg width="20" height="20" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div><div class="exp-swipe-left"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>';
     const row=document.createElement('div');row.className='exp-row';
-    row.innerHTML=`<div class="exp-em">${catIcon(cat.id)}</div><div class="exp-info"><div class="exp-cat">${cat.name}</div><div class="exp-date">${dateStr}</div>${exp.recurring?'<div class="exp-recurring">↻ ricorrente</div>':''}</div><span class="exp-amt">-€ ${fmt2(exp.amount)}</span>${past?'':'<button class="exp-del" onclick="deleteExpense(\''+exp.id+'\')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'}`;
-    el.appendChild(row);
+    row.innerHTML=`<div class="exp-em">${catIcon(cat.id)}</div><div class="exp-info"><div class="exp-cat">${cat.name}</div><div class="exp-date">${dateStr}</div>${exp.recurring?'<div class="exp-recurring">↻ ricorrente</div>':''}</div><span class="exp-amt">-€ ${fmt2(exp.amount)}</span>`;
+    wrap2.appendChild(row);
+    el.appendChild(wrap2);
+    initExpSwipe(wrap2, exp.id, past);
   });
 }
 
@@ -1128,6 +1140,42 @@ function toggleCats(){
 }
 
 // ── SWIPE ──
+function initExpSwipe(wrap, expId, past){
+  if(past) return;
+  const row = wrap.querySelector('.exp-row');
+  const actEdit = wrap.querySelector('.exp-swipe-left');
+  const actDel = wrap.querySelector('.exp-swipe-right');
+  let sx=0, dx=0, drag=false;
+  const TRIGGER=70;
+
+  const start = (x) => { sx=x; dx=0; drag=true; row.classList.add('dragging'); };
+  const move = (x) => {
+    if(!drag) return;
+    dx = x - sx;
+    // clamp: left swipe max -90, right swipe max +90
+    const clamped = Math.max(-90, Math.min(90, dx));
+    row.style.transform = `translateX(${clamped}px)`;
+    if(clamped < 0){ actEdit.style.opacity = Math.min(1, Math.abs(clamped)/TRIGGER); actDel.style.opacity=0; }
+    else { actDel.style.opacity = Math.min(1, clamped/TRIGGER); actEdit.style.opacity=0; }
+  };
+  const end = () => {
+    if(!drag) return;
+    drag=false;
+    row.classList.remove('dragging');
+    if(dx < -TRIGGER){ openEditModal(expId); }
+    else if(dx > TRIGGER){ deleteExpense(expId); }
+    row.style.transform = '';
+    actEdit.style.opacity=0;
+    actDel.style.opacity=0;
+  };
+  row.addEventListener('touchstart', ev=>start(ev.touches[0].clientX), {passive:true});
+  row.addEventListener('touchmove', ev=>move(ev.touches[0].clientX), {passive:true});
+  row.addEventListener('touchend', end);
+  row.addEventListener('mousedown', ev=>start(ev.clientX));
+  window.addEventListener('mousemove', ev=>{if(drag)move(ev.clientX);});
+  window.addEventListener('mouseup', end);
+}
+
 function initSwipe(wrap,cat){
   const card=wrap.querySelector('.cat-card'),action=wrap.querySelector('.cat-card-action');
   let sx=0,cx=0,drag=false,trig=false;
@@ -1144,11 +1192,27 @@ function initSwipe(wrap,cat){
 
 // ── MODAL ──
 function openModal(catId){
+  editingExpenseId=null;
   modalPreselectedCat=catId;buildCatPicker(catId);
   document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
   document.getElementById('fAmount').value='';document.getElementById('fDesc').value='';document.getElementById('fRecurring').checked=false;
   const t=document.getElementById('modalTitleCat');
   if(catId){const c=setupData.cats.find(x=>x.id===catId);t.textContent=c?c.name:'spesa';}else t.textContent='spesa';
+  document.getElementById('modalSaveBtn').textContent='Aggiungi spesa';
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('fAmount').focus(),400);
+}
+function openEditModal(expId){
+  const exp=expenses.find(e=>e.id===expId);if(!exp)return;
+  editingExpenseId=expId;
+  modalPreselectedCat=exp.catId;buildCatPicker(exp.catId);
+  document.getElementById('fAmount').value=exp.amount;
+  document.getElementById('fDesc').value=exp.desc||'';
+  document.getElementById('fDate').value=exp.date;
+  document.getElementById('fRecurring').checked=exp.recurring||false;
+  const cat=setupData.cats.find(x=>x.id===exp.catId);
+  document.getElementById('modalTitleCat').textContent=cat?cat.name:'spesa';
+  document.getElementById('modalSaveBtn').textContent='Salva modifiche';
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('fAmount').focus(),400);
 }
@@ -1170,7 +1234,13 @@ function saveExpense(){
   const date=document.getElementById('fDate').value||new Date().toISOString().split('T')[0];
   const recurring=document.getElementById('fRecurring').checked;
   const desc=document.getElementById('fDesc').value.trim();
-  expenses.push({id:Date.now().toString(),catId:modalPreselectedCat,amount,date,recurring,desc});
+  if(editingExpenseId){
+    const idx=expenses.findIndex(e=>e.id===editingExpenseId);
+    if(idx>-1)expenses[idx]={...expenses[idx],catId:modalPreselectedCat,amount,date,recurring,desc};
+    editingExpenseId=null;
+  } else {
+    expenses.push({id:Date.now().toString(),catId:modalPreselectedCat,amount,date,recurring,desc});
+  }
   saveExpenses();closeModal();buildDash();
 }
 function deleteExpense(id){expenses=expenses.filter(e=>e.id!==id);saveExpenses();buildDash();}
