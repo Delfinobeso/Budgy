@@ -292,6 +292,7 @@
   .mhist-detail{font-family:var(--font);font-size:.72rem;color:var(--text2);}
   .mhist-amt{font-family:var(--font);font-weight:700;font-size:1rem;color:var(--green);text-align:right;}
   .mhist-amt.zero{color:var(--text3);}
+  .mhist-amt.over{color:var(--red);}
   .mhist-badge{font-family:var(--font);font-size:.65rem;font-weight:600;padding:2px 7px;border-radius:5px;margin-top:3px;display:inline-block;}
   .mhist-badge.saved{background:rgba(76,175,132,.12);color:var(--green);}
   .mhist-badge.pending{background:var(--bg3);color:var(--text2);}
@@ -1062,7 +1063,7 @@ function buildSavingsPanel(){
     <div class="piggy-top">
       <div>
         <div class="piggy-lbl">Salvadanaio totale</div>
-        <div class="piggy-amt">€ ${fmt(totalSaved)}</div>
+        <div class="piggy-amt" style="${totalSaved<0?'color:var(--red)':''}">${totalSaved<0?'-':''}€ ${fmt(Math.abs(totalSaved))}</div>
       </div>
       <div class="piggy-icon"><svg viewBox="0 0 24 24"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c2-.5 3-2.3 3-5 0-.5 0-2.5-2-3z"/><path d="M2 9.5C2 11 4 11.5 4 12"/></svg></div>
     </div>
@@ -1092,17 +1093,19 @@ function buildSavingsPanel(){
     [...closedArr].reverse().forEach(([key,data])=>{
       const [y,m]=key.split('-');
       const monthName=MONTHS[parseInt(m)-1]+' '+y;
-      const saved=data.saved||0;
+      const saved=data.saved!=null?data.saved:0;
       const spent=data.spent||0;
       const budget=data.budget||0;
+      const isNeg=saved<0;
+      const isZero=saved===0;
       html+=`<div class="mhist-row">
         <div class="mhist-info">
           <div class="mhist-month">${monthName}</div>
           <div class="mhist-detail">Speso € ${fmt(spent)} su € ${fmt(budget)}</div>
-          <span class="mhist-badge saved">+€ ${fmt(saved)} salvati</span>
+          <span class="mhist-badge ${isNeg?'over':isZero?'pending':'saved'}">${isNeg?'-€ '+fmt(Math.abs(saved))+' scalati':isZero?'±€ 0 in pareggio':'+€ '+fmt(saved)+' salvati'}</span>
         </div>
         <div style="text-align:right;">
-          <div class="mhist-amt">+€ ${fmt(saved)}</div>
+          <div class="mhist-amt ${isNeg?'over':isZero?'zero':''}">${isNeg?'-':'+'}€ ${fmt(Math.abs(saved))}</div>
         </div>
       </div>`;
     });
@@ -1116,11 +1119,12 @@ function openCloseMonth(){
   const monthExp=expenses.filter(e=>{const d=new Date(e.date);return d.getFullYear()===currentYear&&d.getMonth()===currentMonth;});
   const totalSpent=monthExp.reduce((s,e)=>s+e.amount,0);
   const totalLeft=setupData.income-totalSpent;
+  const isDeficit=totalLeft<0;
   document.getElementById('closeMonthPreview').innerHTML=`
     <div class="cmp-row"><span class="cmp-lbl">Budget del mese</span><span class="cmp-val">€ ${fmt(setupData.income)}</span></div>
     <div class="cmp-row"><span class="cmp-lbl">Totale speso</span><span class="cmp-val red">€ ${fmt(totalSpent)}</span></div>
     <div class="cmp-div"></div>
-    <div class="cmp-row"><span class="cmp-lbl">Avanzo al salvadanaio</span><span class="cmp-val green">€ ${fmt(totalLeft)}</span></div>`;
+    <div class="cmp-row"><span class="cmp-lbl">${isDeficit?'Deficit scalato dal salvadanaio':'Avanzo al salvadanaio'}</span><span class="cmp-val ${isDeficit?'red':'green'}">${isDeficit?'-':''}€ ${fmt(Math.abs(totalLeft))}</span></div>`;
   document.getElementById('closeMonthOverlay').classList.add('open');
 }
 function handleCloseOverlayClick(e){if(e.target===document.getElementById('closeMonthOverlay'))document.getElementById('closeMonthOverlay').classList.remove('open');}
@@ -1130,7 +1134,7 @@ function confirmCloseMonth(){
   const totalLeft=setupData.income-totalSpent;
   const monthKey=`${currentYear}-${String(currentMonth+1).padStart(2,'0')}`;
   const closedMonths=JSON.parse(localStorage.getItem('bm_closed')||'{}');
-  closedMonths[monthKey]={saved:Math.max(0,totalLeft),spent:totalSpent,budget:setupData.income,closedAt:new Date().toISOString()};
+  closedMonths[monthKey]={saved:totalLeft,spent:totalSpent,budget:setupData.income,closedAt:new Date().toISOString()};
   localStorage.setItem('bm_closed',JSON.stringify(closedMonths));
   document.getElementById('closeMonthOverlay').classList.remove('open');
   buildDash();
