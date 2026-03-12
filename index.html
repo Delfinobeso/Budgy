@@ -134,7 +134,8 @@
 
   /* DASHBOARD */
   #dashScreen{justify-content:flex-start;overflow-y:auto;overflow-x:hidden;padding:0;-webkit-overflow-scrolling:touch;background:var(--bg);}
-  .dash-inner{width:100%;max-width:480px;padding:calc(env(safe-area-inset-top,0px) + 16px) 18px calc(env(safe-area-inset-bottom,0px) + 96px);}
+  #dashScreen::after{content:'';position:fixed;bottom:0;left:0;right:0;height:calc(env(safe-area-inset-bottom,0px) + 52px);background:linear-gradient(to bottom,transparent 0%,var(--bg) 100%);pointer-events:none;z-index:99;}
+  .dash-inner{width:100%;max-width:480px;padding:calc(env(safe-area-inset-top,0px) + 16px) 18px calc(env(safe-area-inset-bottom,0px) + 76px);}
   .dash-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
   .dash-logo{font-family:var(--font);font-weight:700;font-size:1.65rem;letter-spacing:-.3px;display:flex;align-items:center;gap:9px;}
   .dash-logo-mark{width:32px;height:32px;border-radius:9px;background:var(--accent1);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:6px;}
@@ -253,7 +254,7 @@
   .exp-del svg{width:15px;height:15px;stroke:var(--red);fill:none;stroke-width:2;stroke-linecap:round;}
 
   /* FAB */
-  .fab{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);left:50%;translate:-50% 0;width:56px;height:56px;border-radius:18px;background:var(--accent1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px var(--shadow);transition:opacity .2s cubic-bezier(.34,1.56,.64,1),scale .2s cubic-bezier(.34,1.56,.64,1);z-index:100;scale:1;}
+  .fab{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);left:50%;translate:-50% 0;width:56px;height:56px;border-radius:18px;background:var(--accent1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px var(--shadow);transition:opacity .2s cubic-bezier(.34,1.56,.64,1),scale .2s cubic-bezier(.34,1.56,.64,1);z-index:100;scale:1;}
   .fab svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
   .fab:active{transform:scale(.88);}
   .fab.hidden{scale:0;opacity:0;pointer-events:none;}
