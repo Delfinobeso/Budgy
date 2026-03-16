@@ -134,8 +134,8 @@
 
   /* DASHBOARD */
   #dashScreen{justify-content:flex-start;overflow-y:auto;overflow-x:hidden;padding:0;-webkit-overflow-scrolling:touch;background:var(--bg);}
-  #dashScreen::after{content:'';position:fixed;bottom:0;left:0;right:0;height:calc(env(safe-area-inset-bottom,0px) + 52px);background:linear-gradient(to bottom,transparent 0%,var(--bg) 100%);pointer-events:none;z-index:99;}
-  .dash-inner{width:100%;max-width:480px;padding:calc(env(safe-area-inset-top,0px) + 16px) 18px calc(env(safe-area-inset-bottom,0px) + 76px);}
+  #dashScreen::after{content:'';position:fixed;bottom:0;left:0;right:0;height:calc(env(safe-area-inset-bottom,0px) + 24px);background:linear-gradient(to bottom,transparent 0%,var(--bg) 100%);pointer-events:none;z-index:99;}
+  .dash-inner{width:100%;max-width:480px;padding:calc(env(safe-area-inset-top,0px) + 16px) 18px calc(env(safe-area-inset-bottom,0px) + 24px);}
   .dash-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
   .dash-logo{font-family:var(--font);font-weight:700;font-size:1.65rem;letter-spacing:-.3px;display:flex;align-items:center;gap:9px;}
   .dash-logo-mark{width:32px;height:32px;border-radius:9px;background:var(--accent1);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:6px;}
