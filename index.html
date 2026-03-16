@@ -455,10 +455,97 @@
   .mini-nbtn:active,.mini-nbtn.pressed{transform:scale(.85);background:var(--accent1);color:#fff;border-color:transparent;}
   .mini-nbtn.ghost{background:transparent;border-color:transparent;pointer-events:none;}
   .mini-nbtn.del svg{width:17px;height:17px;stroke:var(--text2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ═══ SPLASH SCREEN ═══ */
+  #splashScreen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    pointer-events: none;
+  }
+  .splash-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    animation: splashExit .5s cubic-bezier(.4,0,1,1) 1.6s both;
+  }
+  .splash-icon {
+    width: 88px;
+    height: 88px;
+    background: var(--accent1);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: splashIconPulse .4s cubic-bezier(.34,1.56,.64,1) .9s both;
+    box-shadow: 0 8px 40px var(--shadow);
+  }
+  .splash-icon svg { width: 56px; height: 56px; }
+  .splash-icon svg path { fill: white; opacity: 0; transform-origin: center; }
+  .sp1 { animation: splashPath .5s cubic-bezier(.34,1.56,.64,1) .1s both; }
+  .sp2 { animation: splashPath .5s cubic-bezier(.34,1.56,.64,1) .25s both; }
+  .sp3 { animation: splashPath .5s cubic-bezier(.34,1.56,.64,1) .4s both; }
+  .splash-wordmark {
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 2.2rem;
+    letter-spacing: -.5px;
+    color: var(--text);
+    clip-path: inset(0 100% 0 0);
+    animation: splashWord .4s cubic-bezier(.16,1,.3,1) .65s both;
+  }
+  .splash-tagline {
+    font-family: var(--font);
+    font-size: .85rem;
+    color: var(--text2);
+    opacity: 0;
+    animation: splashFadeIn .3s ease .95s both;
+  }
+  @keyframes splashPath {
+    from { opacity: 0; transform: scale(.6); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes splashWord {
+    from { clip-path: inset(0 100% 0 0); }
+    to   { clip-path: inset(0 0% 0 0); }
+  }
+  @keyframes splashFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes splashIconPulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+  @keyframes splashExit {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to   { opacity: 0; transform: translateY(-16px) scale(.95); }
+  }
 </style>
 </head>
 <body>
 
+<div id="splashScreen" aria-hidden="true">
+  <div class="splash-logo">
+    <div class="splash-icon">
+      <svg id="splashSvg" width="64" height="60" viewBox="0 0 530 493"
+           fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path class="sp1" d="M497.169 172.915C497.529 173.145 497.668 173.2 497.965 173.583C500.656 177.045 504.628 188.316 506.452 192.755C520.473 226.876 530.815 262.308 529.354 299.533C527.165 355.331 503.796 405.487 462.758 443.313C427.3 476.458 380.05 494.029 331.551 492.104C274.776 489.67 229.829 461.679 192.228 420.8C167.359 392.833 143.744 350.603 143.055 312.427C143.398 312.774 143.747 313.115 144.1 313.451C186.768 353.401 244.509 369.39 301.922 367.722C354.126 366.205 406.266 344.306 442.178 306.092C468.278 278.477 486.069 244.067 493.513 206.806C495.815 195.721 497.525 184.251 497.169 172.915Z"/>
+        <path class="sp2" d="M160.941 106.863C164.066 106.431 167.523 106.623 170.691 106.613C189.68 106.553 208.103 109.792 226.26 115.193C196.192 132.281 170.961 156.731 152.936 186.247C124.414 232.262 115.492 287.778 128.162 340.411C141.218 395.811 180.435 442.928 226.029 475.393C231.684 479.421 237.714 482.988 243.616 486.644C237.323 485.839 230.868 485.817 224.536 485.198C213.446 484.023 202.389 482.546 191.38 480.769C145.425 472.085 100.973 455.02 64.5607 425.071C27.0808 394.244 5.34412 354.541 0.754084 306.09C-3.8019 258.006 12.5173 205.724 43.4611 168.676C73.5341 132.67 114.142 111.101 160.941 106.863Z"/>
+        <path class="sp3" d="M273.209 0.378223C287.359 -0.734777 302.723 0.731098 316.695 3.1751C369.353 12.3861 415.488 45.401 445.79 88.8069C469.74 123.115 482.374 162.715 474.777 204.747C465.838 254.195 435.389 294.937 395.02 323.535C394.355 324.006 393.439 323.526 393.436 322.712C393.34 294.036 382.565 258.584 370.933 232.805C370.612 232.017 370.274 231.236 369.923 230.462C343.836 172.405 295.101 122.332 234.975 99.8489C202.527 87.7159 165.758 84.8556 132.114 93.6126C120.159 96.7238 109.069 101.187 97.8918 106.169C96.9044 106.609 95.9828 105.367 96.6847 104.545C103.622 96.4194 110.078 87.887 117.311 79.9759C158.582 34.834 211.053 3.20733 273.209 0.378223Z"/>
+      </svg>
+    </div>
+    <div class="splash-wordmark">Budgy</div>
+    <div class="splash-tagline">il tuo budget personale</div>
+  </div>
+</div>
 
 
 <!-- PIN -->
@@ -795,6 +882,17 @@
 </div>
 
 <script>
+(function(){
+  const splash = document.getElementById('splashScreen');
+  if(!splash) return;
+  // Total animation: 1.6s play + 0.5s exit = 2.1s
+  setTimeout(() => {
+    splash.style.pointerEvents = 'none';
+    // remove from DOM after exit animation completes
+    setTimeout(() => splash.remove(), 520);
+  }, 1600);
+})();
+
 // ── UTILS ──
 function fmt(n){return new Intl.NumberFormat('it-IT',{minimumFractionDigits:0,maximumFractionDigits:2}).format(n);}
 function fmt2(n){return new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);}
