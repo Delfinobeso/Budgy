@@ -1387,19 +1387,30 @@ function updateSetBar(){
 }
 
 function saveSettings(){
-  const tot=Math.round(setCats.reduce((s,c)=>s+c.pct,0));
-  if(tot!==100){const inc2=base+extra;const totEur=setCats.reduce((s,c)=>s+(inc2*(c.pct/100)),0);alert('Gli importi devono coprire tutto lo stipendio. Mancano €'+fmt(inc2-totEur)+'.');return;}
-  const base=parseFloat(document.getElementById('setBase').value)||0;
-  const extra=parseFloat(document.getElementById('setExtra').value)||0;
-  if(base<=0){alert('Inserisci uno stipendio valido.');return;}
-  const newIncome=base+extra;
-  localStorage.setItem('bm_salBase',base);
-  localStorage.setItem('bm_salExtra',extra);
-  const sd=JSON.parse(localStorage.getItem('bm_setup')||'{}');
-  sd.income=newIncome;sd.cats=setCats;
-  localStorage.setItem('bm_setup',JSON.stringify(sd));
-  closeSettings();buildDash();
-  // show tiny feedback
+  const base = parseFloat(document.getElementById('setBase').value) || 0;
+  const extra = parseFloat(document.getElementById('setExtra').value) || 0;
+  const newIncome = base + extra;
+
+  if(base <= 0){
+    alert('Inserisci uno stipendio valido.');
+    return;
+  }
+
+  const tot = Math.round(setCats.reduce((s,c) => s + c.pct, 0));
+  if(tot !== 100){
+    const totEur = setCats.reduce((s,c) => s + (newIncome * (c.pct / 100)), 0);
+    alert('Gli importi devono coprire tutto lo stipendio. Mancano €' + fmt(newIncome - totEur) + '.');
+    return;
+  }
+
+  localStorage.setItem('bm_salBase', base);
+  localStorage.setItem('bm_salExtra', extra);
+  const sd = JSON.parse(localStorage.getItem('bm_setup') || '{}');
+  sd.income = newIncome;
+  sd.cats = setCats;
+  localStorage.setItem('bm_setup', JSON.stringify(sd));
+  closeSettings();
+  buildDash();
   showToast('Impostazioni salvate ✓');
 }
 
