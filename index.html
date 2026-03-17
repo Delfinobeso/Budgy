@@ -1091,6 +1091,7 @@ function buildDash(){
     container.appendChild(wrap);
     if(!past)initSwipe(wrap,cat);
   });
+  if(catsExpanded){container.style.height=container.scrollHeight+'px';}
 
   // expense list (tab spese)
   renderExpenseList(monthExp);
