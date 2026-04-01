@@ -897,6 +897,21 @@
 function fmt(n){return new Intl.NumberFormat('it-IT',{minimumFractionDigits:0,maximumFractionDigits:2}).format(n);}
 function fmt2(n){return new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);}
 
+// 🔧 FIX RETROATTIVO: Calcola salvadanaio totale da mesi già chiusi
+function initSavingsTotal() {
+  const closedMonths = JSON.parse(localStorage.getItem('bm_closed') || '{}');
+  const existingTotal = localStorage.getItem('bm_savingsTotal');
+  
+  // Se non esiste bm_savingsTotal ma ci sono mesi chiusi, calcola retroattivo
+  if (!existingTotal && Object.keys(closedMonths).length > 0) {
+    const totalSaved = Object.values(closedMonths).reduce((s, m) => s + (m.saved || 0), 0);
+    localStorage.setItem('bm_savingsTotal', totalSaved.toString());
+    console.log('💰 Salvadanaio retroattivo calcolato: €' + fmt(totalSaved));
+  }
+}
+// Esegui all'avvio
+initSavingsTotal();
+
 // ── ICONS ──
 const CAT_ICONS={
   affitto:`<svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>`,
@@ -1168,7 +1183,15 @@ function renderExpenseList(list){
 function buildSavingsPanel(){
   const panel=document.getElementById('panel-savings');
   const closedMonths=JSON.parse(localStorage.getItem('bm_closed')||'{}');
-  const totalSaved=Object.values(closedMonths).reduce((s,m)=>s+(m.saved||0),0);
+  
+  // 🔧 FIX: LEGGI DAL TOTALE SALVATO (o calcola retroattivo)
+  let totalSaved = parseFloat(localStorage.getItem('bm_savingsTotal') || '0');
+  if (totalSaved === 0 && Object.keys(closedMonths).length > 0) {
+    // Calcola retroattivo se non esiste ancora
+    totalSaved = Object.values(closedMonths).reduce((s,m)=>s+(m.saved||0),0);
+    localStorage.setItem('bm_savingsTotal', totalSaved.toString());
+  }
+  
   // projection: average of last 3 closed months × 12
   const closedArr=Object.entries(closedMonths).sort((a,b)=>a[0].localeCompare(b[0]));
   const last3=closedArr.slice(-3).map(([,v])=>v.saved||0);
@@ -1253,6 +1276,12 @@ function confirmCloseMonth(){
   const closedMonths=JSON.parse(localStorage.getItem('bm_closed')||'{}');
   closedMonths[monthKey]={saved:totalLeft,spent:totalSpent,budget:setupData.income,closedAt:new Date().toISOString()};
   localStorage.setItem('bm_closed',JSON.stringify(closedMonths));
+  
+  // 🔧 FIX: AGGIUNGI AVANZO AL SALVADANAIO TOTALE
+  const currentSavings = parseFloat(localStorage.getItem('bm_savingsTotal') || '0');
+  const newSavings = currentSavings + totalLeft;
+  localStorage.setItem('bm_savingsTotal', newSavings.toString());
+  
   document.getElementById('closeMonthOverlay').classList.remove('open');
   buildDash();
   // switch to savings tab to show the result
