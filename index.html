@@ -1034,11 +1034,37 @@ function switchTab(tab){
   if(tab==='savings')buildSavingsPanel();
 }
 
+// ── AUTO-CLOSE PAST MONTHS ──
+function autoClosePastMonths(){
+  if(!setupData)return;
+  const closedMonths=JSON.parse(localStorage.getItem('bm_closed')||'{}');
+  const now=new Date();
+  const setupDate=new Date(setupData.createdAt||now);
+  let changed=false;
+  for(let i=1;i<=24;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    if(d<new Date(setupDate.getFullYear(),setupDate.getMonth(),1))break;
+    const y=d.getFullYear(),m=d.getMonth();
+    const key=`${y}-${String(m+1).padStart(2,'0')}`;
+    if(!closedMonths[key]){
+      const monthExp=expenses.filter(e=>{const ed=new Date(e.date);return ed.getFullYear()===y&&ed.getMonth()===m;});
+      const spent=monthExp.reduce((s,e)=>s+e.amount,0);
+      const left=setupData.income-spent;
+      closedMonths[key]={saved:left,spent,budget:setupData.income,closedAt:new Date().toISOString(),auto:true};
+      const cur=parseFloat(localStorage.getItem('bm_savingsTotal')||'0');
+      localStorage.setItem('bm_savingsTotal',(cur+left).toString());
+      changed=true;
+    }
+  }
+  if(changed)localStorage.setItem('bm_closed',JSON.stringify(closedMonths));
+}
+
 // ── DASH BUILD ──
 function buildDash(){
   const raw=localStorage.getItem('bm_setup');if(!raw)return;
   setupData=JSON.parse(raw);
   loadExpenses();
+  autoClosePastMonths();
 
   // month label + nav arrows
   document.getElementById('dashDate').textContent=MONTHS[currentMonth]+' '+currentYear;
@@ -1060,10 +1086,10 @@ function buildDash(){
   const monthKey=`${currentYear}-${String(currentMonth+1).padStart(2,'0')}`;
   const closedMonths=JSON.parse(localStorage.getItem('bm_closed')||'{}');
   const isLastDayOrPast=()=>{const n=new Date();const lastDay=new Date(currentYear,currentMonth+1,0).getDate();return isCurrentMonth()&&n.getDate()>=lastDay-2;};
-  const showBanner=isCurrentMonth()&&!closedMonths[monthKey]&&totalLeft>0&&isLastDayOrPast();
+  const showBanner=isCurrentMonth()&&!closedMonths[monthKey]&&isLastDayOrPast();
   const banner=document.getElementById('closeBanner');
   banner.style.display=showBanner?'flex':'none';
-  if(showBanner)document.getElementById('closeBannerSub').textContent=`Avanzo di € ${fmt(totalLeft)} pronto per il salvadanaio`;
+  if(showBanner)document.getElementById('closeBannerSub').textContent=totalLeft>0?`Avanzo di € ${fmt(totalLeft)} pronto per il salvadanaio`:`Deficit di € ${fmt(Math.abs(totalLeft))} — chiudi per aggiornare il salvadanaio`;
 
   // hero
   document.getElementById('heroAmt').textContent='€ '+fmt(totalBudget);
@@ -1385,7 +1411,9 @@ function openEditModal(expId){
   setTimeout(()=>document.getElementById('fAmount').focus(),400);
 }
 function buildCatPicker(sel){
+  if(!setupData||!setupData.cats||!setupData.cats.length){const raw=localStorage.getItem('bm_setup');if(raw)setupData=JSON.parse(raw);}
   const p=document.getElementById('catPicker');p.innerHTML='';
+  if(!setupData||!setupData.cats)return;
   setupData.cats.forEach(cat=>{
     const btn=document.createElement('button');btn.className='cat-pick-btn'+(cat.id===sel?' selected':'');
     btn.innerHTML=`<div class="cpb-em">${catIcon(cat.id)}</div><span class="cpb-nm">${cat.name}</span>`;
@@ -1470,7 +1498,7 @@ function onSetSalary(){
 // working copy of cats for settings
 let setCats=[];
 function buildSetCatList(cats){
-  setCats=cats.map(c=>({...c}));
+  setCats=(cats||[]).map(c=>({...c}));
   renderSetCatList();
 }
 let setCatsExpanded = false;
@@ -1624,7 +1652,7 @@ function handleMiniPin(){
 // ── RESET APP ──
 function resetApp(){
   if(!confirm('⚠ Reset completo?\n\nVerranno eliminati:\n• Tutte le spese\n• Impostazioni e categorie\n• PIN\n• Salvadanaio\n\nQuesta azione è irreversibile.'))return;
-  ['bm_pin','bm_setup','bm_expenses','bm_closed','bm_theme','bm_salBase','bm_salExtra'].forEach(k=>localStorage.removeItem(k));
+  ['bm_pin','bm_setup','bm_expenses','bm_closed','bm_theme','bm_salBase','bm_salExtra','bm_savingsTotal'].forEach(k=>localStorage.removeItem(k));
   location.reload();
 }
 
@@ -1640,6 +1668,13 @@ function showToast(msg){
 </script>
 
 <script>
+// iOS bfcache: quando la pagina viene "scongelata" dal cache ricarica lo stato
+window.addEventListener('pageshow', (e) => {
+  if(e.persisted && setupData) buildDash();
+});
+</script>
+
+<script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', async () => {
     try {
@@ -1647,7 +1682,10 @@ if('serviceWorker' in navigator){
 
       // Controlla aggiornamenti ogni volta che l'app torna in primo piano
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') reg.update();
+        if (document.visibilityState === 'visible') {
+          reg.update();
+          if(setupData) buildDash();
+        }
       });
 
       // Quando c'è un nuovo SW pronto, attivalo e ricarica
