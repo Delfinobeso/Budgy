@@ -1498,7 +1498,7 @@ function onSetSalary(){
 // working copy of cats for settings
 let setCats=[];
 function buildSetCatList(cats){
-  setCats=cats.map(c=>({...c}));
+  setCats=(cats||[]).map(c=>({...c}));
   renderSetCatList();
 }
 let setCatsExpanded = false;
