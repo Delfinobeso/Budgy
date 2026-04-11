@@ -895,6 +895,11 @@
 
 // ── UTILS ──
 function fmt(n){return new Intl.NumberFormat('it-IT',{minimumFractionDigits:0,maximumFractionDigits:2}).format(n);}
+
+// ── SCROLL LOCK (iOS PWA fix) ──
+let _slY=0,_slD=0;
+function lockScroll(){if(_slD===0){_slY=window.scrollY;document.body.style.overflow='hidden';document.body.style.position='fixed';document.body.style.top='-'+_slY+'px';document.body.style.width='100%';}_slD++;}
+function unlockScroll(){if(_slD>0)_slD--;if(_slD===0){document.body.style.position='';document.body.style.overflow='';document.body.style.top='';document.body.style.width='';window.scrollTo(0,_slY);}}
 function fmt2(n){return new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);}
 
 // 🔧 FIX RETROATTIVO: Calcola salvadanaio totale da mesi già chiusi
@@ -1387,7 +1392,7 @@ function openModal(catId){
   const t=document.getElementById('modalTitleCat');
   if(catId){const c=setupData.cats.find(x=>x.id===catId);t.textContent=c?c.name:'spesa';}else t.textContent='spesa';
   document.getElementById('modalSaveBtn').textContent='Aggiungi spesa';
-  document.getElementById('modalOverlay').classList.add('open');
+  lockScroll();document.getElementById('modalOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('fAmount').focus(),400);
 }
 function openEditModal(expId){
@@ -1402,7 +1407,7 @@ function openEditModal(expId){
   const cat=setupData.cats.find(x=>x.id===exp.catId);
   document.getElementById('modalTitleCat').textContent=cat?cat.name:'spesa';
   document.getElementById('modalSaveBtn').textContent='Salva modifiche';
-  document.getElementById('modalOverlay').classList.add('open');
+  lockScroll();document.getElementById('modalOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('fAmount').focus(),400);
 }
 function buildCatPicker(sel){
@@ -1417,7 +1422,7 @@ function buildCatPicker(sel){
   });
 }
 function handleOverlayClick(e){if(e.target===document.getElementById('modalOverlay'))closeModal();}
-function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+function closeModal(){unlockScroll();document.getElementById('modalOverlay').classList.remove('open');}
 function saveExpense(){
   const amount=parseFloat(document.getElementById('fAmount').value);
   if(!amount||amount<=0){document.getElementById('fAmount').style.borderColor='var(--red)';setTimeout(()=>document.getElementById('fAmount').style.borderColor='',1000);return;}
@@ -1478,9 +1483,9 @@ function openSettings(){setCatsExpanded=false;updatePinToggleUI();
   document.getElementById('setExtra').value=extra||'';
   document.getElementById('setTotal').textContent='€ '+fmt(base+extra);
   buildSetCatList(sd.cats);
-  document.getElementById('settingsOverlay').classList.add('open');
+  lockScroll();document.getElementById('settingsOverlay').classList.add('open');
 }
-function closeSettings(){document.getElementById('settingsOverlay').classList.remove('open');}
+function closeSettings(){unlockScroll();document.getElementById('settingsOverlay').classList.remove('open');}
 function handleSettingsOverlay(e){if(e.target===document.getElementById('settingsOverlay'))closeSettings();}
 
 function onSetSalary(){
@@ -1591,10 +1596,10 @@ function saveSettings(){
 function openNewCatModal(){
   document.getElementById('newCatName').value='';
   document.getElementById('newCatPct').value='';
-  document.getElementById('newCatOverlay').classList.add('open');
+  lockScroll();document.getElementById('newCatOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('newCatName').focus(),350);
 }
-function handleNewCatOverlay(e){if(e.target===document.getElementById('newCatOverlay'))document.getElementById('newCatOverlay').classList.remove('open');}
+function handleNewCatOverlay(e){if(e.target===document.getElementById('newCatOverlay')){unlockScroll();document.getElementById('newCatOverlay').classList.remove('open');}}
 function confirmNewCat(){
   const name=document.getElementById('newCatName').value.trim();
   const eur=parseFloat(document.getElementById('newCatPct').value)||0;
@@ -1603,7 +1608,7 @@ function confirmNewCat(){
   const pct=inc?(eur/inc*100):0;
   const id='cat_'+Date.now();
   setCats.push({id,name,pct,color:'#8A8AA8',type:'custom'});
-  document.getElementById('newCatOverlay').classList.remove('open');
+  unlockScroll();document.getElementById('newCatOverlay').classList.remove('open');
   renderSetCatList();
 }
 
