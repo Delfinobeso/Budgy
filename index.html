@@ -135,7 +135,7 @@
 
   /* DASHBOARD */
   #dashScreen{justify-content:flex-start;overflow-y:auto;overflow-x:hidden;padding:0;-webkit-overflow-scrolling:touch;background:var(--bg);}
-  #dashScreen::after{content:'';position:fixed;bottom:0;left:0;right:0;height:calc(env(safe-area-inset-bottom,0px) + 16px);background:linear-gradient(to bottom,transparent 0%,var(--bg) 100%);pointer-events:none;z-index:99;}
+  #dashScreen::after{content:'';position:fixed;bottom:0;left:0;right:0;height:calc(env(safe-area-inset-bottom,0px) / 2 + 8px);background:linear-gradient(to bottom,transparent 0%,var(--bg) 100%);pointer-events:none;z-index:99;}
   .dash-inner{width:100%;max-width:480px;padding:calc(env(safe-area-inset-top,0px) + 16px) 18px calc(env(safe-area-inset-bottom,0px) + 72px);}
   .dash-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
   .dash-logo{font-family:var(--font);font-weight:700;font-size:1.65rem;letter-spacing:-.3px;display:flex;align-items:center;gap:9px;}
@@ -1090,7 +1090,8 @@ function buildDash(){
   // close month banner (show only on current month if not already closed)
   const monthKey=`${currentYear}-${String(currentMonth+1).padStart(2,'0')}`;
   const closedMonths=JSON.parse(localStorage.getItem('bm_closed')||'{}');
-  const showBanner=isCurrentMonth()&&!closedMonths[monthKey]&&totalLeft>0;
+  const isLastDayOrPast=()=>{const n=new Date();const lastDay=new Date(currentYear,currentMonth+1,0).getDate();return isCurrentMonth()&&n.getDate()>=lastDay-2;};
+  const showBanner=isCurrentMonth()&&!closedMonths[monthKey]&&totalLeft>0&&isLastDayOrPast();
   const banner=document.getElementById('closeBanner');
   banner.style.display=showBanner?'flex':'none';
   if(showBanner)document.getElementById('closeBannerSub').textContent=`Avanzo di € ${fmt(totalLeft)} pronto per il salvadanaio`;
@@ -1136,6 +1137,8 @@ function buildDash(){
     container.appendChild(wrap);
     if(!past)initSwipe(wrap,cat);
   });
+  // Sync visual state after rebuild (opacity was never changed to 1)
+  if(catsExpanded){container.style.height=container.scrollHeight+'px';container.style.opacity='1';container.style.marginTop='8px';}
 
   // expense list (tab spese)
   renderExpenseList(monthExp);
@@ -1182,7 +1185,7 @@ function renderExpenseListHome(list){
     el.appendChild(more);
   }
   const spacer = document.createElement('div');
-  spacer.style.height = '80px';
+  spacer.style.height = '40px';
   el.appendChild(spacer);
 }
 
@@ -1205,7 +1208,7 @@ function renderExpenseList(list){
     initExpSwipe(wrap2, exp.id, past);
   });
   const spacer = document.createElement('div');
-  spacer.style.height = '80px';
+  spacer.style.height = '40px';
   el.appendChild(spacer);
 }
 
@@ -1319,8 +1322,12 @@ function toggleCats(){
   if(catsExpanded){
     el.classList.add('expanded');
     el.style.height=el.scrollHeight+'px';
+    el.style.opacity='1';
+    el.style.marginTop='8px';
   } else {
     el.style.height=el.scrollHeight+'px';
+    el.style.opacity='0';
+    el.style.marginTop='0';
     requestAnimationFrame(()=>{
       el.style.height='0px';
       el.classList.remove('expanded');
