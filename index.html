@@ -1386,6 +1386,7 @@ function initSwipe(wrap,cat){
 
 // ── MODAL ──
 function openModal(catId){
+  if(!setupData){const raw=localStorage.getItem('bm_setup');if(!raw)return;setupData=JSON.parse(raw);loadExpenses();}
   editingExpenseId=null;
   modalPreselectedCat=catId;buildCatPicker(catId);
   document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
@@ -1397,6 +1398,7 @@ function openModal(catId){
   setTimeout(()=>document.getElementById('fAmount').focus(),400);
 }
 function openEditModal(expId){
+  if(!setupData){const raw=localStorage.getItem('bm_setup');if(!raw)return;setupData=JSON.parse(raw);loadExpenses();}
   const exp=expenses.find(e=>e.id===expId);if(!exp)return;
   editingExpenseId=expId;
   modalPreselectedCat=exp.catId;buildCatPicker(exp.catId);
@@ -1670,7 +1672,10 @@ function showToast(msg){
 <script>
 // iOS bfcache: quando la pagina viene "scongelata" dal cache ricarica lo stato
 window.addEventListener('pageshow', (e) => {
-  if(e.persisted && setupData) buildDash();
+  if(e.persisted){
+    const raw=localStorage.getItem('bm_setup');
+    if(raw){setupData=JSON.parse(raw);loadExpenses();buildDash();}
+  }
 });
 </script>
 
