@@ -909,8 +909,6 @@ function initSavingsTotal() {
     console.log('💰 Salvadanaio retroattivo calcolato: €' + fmt(totalSaved));
   }
 }
-// Esegui all'avvio
-initSavingsTotal();
 
 // ── ICONS ──
 const CAT_ICONS={
@@ -1066,6 +1064,7 @@ function buildDash(){
   setupData=JSON.parse(raw);
   loadExpenses();
   autoClosePastMonths();
+  initSavingsTotal();
 
   // month label + nav arrows
   document.getElementById('dashDate').textContent=MONTHS[currentMonth]+' '+currentYear;
@@ -1210,13 +1209,7 @@ function buildSavingsPanel(){
   const panel=document.getElementById('panel-savings');
   const closedMonths=JSON.parse(localStorage.getItem('bm_closed')||'{}');
   
-  // 🔧 FIX: LEGGI DAL TOTALE SALVATO (o calcola retroattivo)
-  let totalSaved = parseFloat(localStorage.getItem('bm_savingsTotal') || '0');
-  if (totalSaved === 0 && Object.keys(closedMonths).length > 0) {
-    // Calcola retroattivo se non esiste ancora
-    totalSaved = Object.values(closedMonths).reduce((s,m)=>s+(m.saved||0),0);
-    localStorage.setItem('bm_savingsTotal', totalSaved.toString());
-  }
+  const totalSaved = parseFloat(localStorage.getItem('bm_savingsTotal') || '0');
   
   // projection: average of last 3 closed months × 12
   const closedArr=Object.entries(closedMonths).sort((a,b)=>a[0].localeCompare(b[0]));
