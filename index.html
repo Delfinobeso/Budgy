@@ -811,6 +811,28 @@
       <button class="set-save-btn" onclick="saveSettings()">Salva modifiche</button>
       <div style="height:16px;"></div>
 
+      <!-- BACKUP -->
+      <div class="set-section">
+        <div class="set-section-title">Backup e ripristino</div>
+        <div class="set-card">
+          <div class="set-row" onclick="exportData()" style="cursor:pointer;">
+            <div class="set-row-icon" style="background:rgba(76,175,132,0.12);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </div>
+            <div class="set-row-txt"><div class="set-row-label">Esporta backup</div><div class="set-row-sub">Scarica un file .json con tutti i tuoi dati</div></div>
+            <div class="set-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;stroke:var(--text3);"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <div class="set-row" onclick="importData()" style="cursor:pointer;border-top:1px solid var(--border);">
+            <div class="set-row-icon" style="background:rgba(94,106,210,0.12);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent1)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="17"/></svg>
+            </div>
+            <div class="set-row-txt"><div class="set-row-label">Importa backup</div><div class="set-row-sub">Ripristina i dati da un file .json</div></div>
+            <div class="set-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;stroke:var(--text3);"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div style="height:8px;"></div>
+
       <!-- DANGER ZONE -->
       <div class="set-section">
         <div class="set-section-title">Zona pericolosa</div>
@@ -1667,6 +1689,41 @@ function resetApp(){
   location.reload();
 }
 
+// ── BACKUP EXPORT ──
+function exportData(){
+  const JSON_KEYS=['bm_setup','bm_expenses','bm_closed'];
+  const STR_KEYS=['bm_savingsTotal','bm_salBase','bm_salExtra','bm_theme','bm_pin_disabled'];
+  const data={version:'1',exportDate:new Date().toISOString()};
+  JSON_KEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!==null)try{data[k]=JSON.parse(v);}catch{data[k]=v;}});
+  STR_KEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!==null)data[k]=v;});
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='budgy-backup-'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();URL.revokeObjectURL(url);
+  showToast('Backup esportato ✓');
+}
+
+// ── BACKUP IMPORT ──
+function importData(){document.getElementById('importFileInput').click();}
+function handleImportFile(e){
+  const file=e.target.files[0];e.target.value='';
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    let data;
+    try{data=JSON.parse(ev.target.result);}catch{showToast('File non valido ✗');return;}
+    if(!data.version||!data.bm_setup){showToast('File backup non riconosciuto ✗');return;}
+    if(!confirm('⚠ Ripristino backup?\n\nQuesto sovrascriverà tutti i tuoi dati attuali (spese, categorie, salvadanaio).\nIl PIN attuale non verrà modificato.\n\nContinuare?'))return;
+    const JSON_KEYS=['bm_setup','bm_expenses','bm_closed'];
+    const STR_KEYS=['bm_savingsTotal','bm_salBase','bm_salExtra','bm_theme','bm_pin_disabled'];
+    JSON_KEYS.forEach(k=>{if(data[k]!==undefined)localStorage.setItem(k,JSON.stringify(data[k]));});
+    STR_KEYS.forEach(k=>{if(data[k]!==undefined)localStorage.setItem(k,String(data[k]));});
+    location.reload();
+  };
+  reader.readAsText(file);
+}
+
 // ── TOAST ──
 function showToast(msg){
   const t=document.createElement('div');
@@ -1722,5 +1779,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+<input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImportFile(event)">
 </body>
 </html>
