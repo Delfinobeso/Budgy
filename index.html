@@ -1393,20 +1393,21 @@ function initSwipe(wrap,cat){
 function openModal(catId){
   if(!setupData){const raw=localStorage.getItem('bm_setup');if(!raw)return;setupData=JSON.parse(raw);loadExpenses();}
   editingExpenseId=null;
-  modalPreselectedCat=catId;buildCatPicker(catId);
+  modalPreselectedCat=catId;
   document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
   document.getElementById('fAmount').value='';document.getElementById('fDesc').value='';document.getElementById('fRecurring').checked=false;
   const t=document.getElementById('modalTitleCat');
   if(catId){const c=setupData.cats.find(x=>x.id===catId);t.textContent=c?c.name:'spesa';}else t.textContent='spesa';
   document.getElementById('modalSaveBtn').textContent='Aggiungi spesa';
   lockScroll();document.getElementById('modalOverlay').classList.add('open');
+  requestAnimationFrame(()=>buildCatPicker(catId));
   setTimeout(()=>document.getElementById('fAmount').focus(),400);
 }
 function openEditModal(expId){
   if(!setupData){const raw=localStorage.getItem('bm_setup');if(!raw)return;setupData=JSON.parse(raw);loadExpenses();}
   const exp=expenses.find(e=>e.id===expId);if(!exp)return;
   editingExpenseId=expId;
-  modalPreselectedCat=exp.catId;buildCatPicker(exp.catId);
+  modalPreselectedCat=exp.catId;
   document.getElementById('fAmount').value=exp.amount;
   document.getElementById('fDesc').value=exp.desc||'';
   document.getElementById('fDate').value=exp.date;
@@ -1415,6 +1416,7 @@ function openEditModal(expId){
   document.getElementById('modalTitleCat').textContent=cat?cat.name:'spesa';
   document.getElementById('modalSaveBtn').textContent='Salva modifiche';
   lockScroll();document.getElementById('modalOverlay').classList.add('open');
+  requestAnimationFrame(()=>buildCatPicker(exp.catId));
   setTimeout(()=>document.getElementById('fAmount').focus(),400);
 }
 function buildCatPicker(sel){
@@ -1423,7 +1425,9 @@ function buildCatPicker(sel){
   if(!setupData||!setupData.cats)return;
   setupData.cats.forEach(cat=>{
     const btn=document.createElement('button');btn.className='cat-pick-btn'+(cat.id===sel?' selected':'');
-    btn.innerHTML=`<div class="cpb-em">${catIcon(cat.id)}</div><span class="cpb-nm">${cat.name}</span>`;
+    const em=document.createElement('div');em.className='cpb-em';em.innerHTML=catIcon(cat.id);
+    const nm=document.createElement('span');nm.className='cpb-nm';nm.textContent=cat.name;
+    btn.appendChild(em);btn.appendChild(nm);
     btn.onclick=()=>{document.querySelectorAll('.cat-pick-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');modalPreselectedCat=cat.id;document.getElementById('modalTitleCat').textContent=cat.name;};
     p.appendChild(btn);
   });
