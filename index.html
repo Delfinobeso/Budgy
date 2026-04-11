@@ -1041,16 +1041,17 @@ function autoClosePastMonths(){
   const now=new Date();
   const setupDate=new Date(setupData.createdAt||now);
   let changed=false;
-  for(let i=1;i<=24;i++){
+  for(let i=1;i<=6;i++){
     const d=new Date(now.getFullYear(),now.getMonth()-i,1);
     if(d<new Date(setupDate.getFullYear(),setupDate.getMonth(),1))break;
     const y=d.getFullYear(),m=d.getMonth();
     const key=`${y}-${String(m+1).padStart(2,'0')}`;
     if(!closedMonths[key]){
       const monthExp=expenses.filter(e=>{const ed=new Date(e.date);return ed.getFullYear()===y&&ed.getMonth()===m;});
+      if(!monthExp.length)continue;
       const spent=monthExp.reduce((s,e)=>s+e.amount,0);
       const left=setupData.income-spent;
-      closedMonths[key]={saved:left,spent,budget:setupData.income,closedAt:new Date().toISOString(),auto:true};
+      closedMonths[key]={saved:left,spent,budget:setupData.income,closedAt:new Date().toISOString(),autoClose:true};
       const cur=parseFloat(localStorage.getItem('bm_savingsTotal')||'0');
       localStorage.setItem('bm_savingsTotal',(cur+left).toString());
       changed=true;
@@ -1085,11 +1086,10 @@ function buildDash(){
   // close month banner (show only on current month if not already closed)
   const monthKey=`${currentYear}-${String(currentMonth+1).padStart(2,'0')}`;
   const closedMonths=JSON.parse(localStorage.getItem('bm_closed')||'{}');
-  const isLastDayOrPast=()=>{const n=new Date();const lastDay=new Date(currentYear,currentMonth+1,0).getDate();return isCurrentMonth()&&n.getDate()>=lastDay-2;};
-  const showBanner=isCurrentMonth()&&!closedMonths[monthKey]&&isLastDayOrPast();
+  const showBanner=isCurrentMonth()&&!closedMonths[monthKey]&&totalLeft>0;
   const banner=document.getElementById('closeBanner');
   banner.style.display=showBanner?'flex':'none';
-  if(showBanner)document.getElementById('closeBannerSub').textContent=totalLeft>0?`Avanzo di € ${fmt(totalLeft)} pronto per il salvadanaio`:`Deficit di € ${fmt(Math.abs(totalLeft))} — chiudi per aggiornare il salvadanaio`;
+  if(showBanner)document.getElementById('closeBannerSub').textContent=`Avanzo di € ${fmt(totalLeft)} pronto per il salvadanaio`;
 
   // hero
   document.getElementById('heroAmt').textContent='€ '+fmt(totalBudget);
