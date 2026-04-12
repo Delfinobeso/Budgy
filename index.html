@@ -209,8 +209,8 @@
   .cats-chip{font-family:var(--font);font-size:.7rem;font-weight:500;padding:2px 8px;border-radius:6px;background:var(--bg3);color:var(--text2);white-space:nowrap;}
   .cats-chip.over{background:rgba(232,96,76,.12);color:var(--red);}
   .cats-chip.warn{background:rgba(212,168,71,.1);color:var(--accent4);}
-  .cat-cards{display:flex;flex-direction:column;gap:9px;margin-bottom:0;overflow:hidden;height:0;margin-top:0;transition:height .4s cubic-bezier(.16,1,.3,1),margin .3s ease;}
-  .cat-cards.expanded{margin-top:9px;}
+  .cat-cards{display:flex;flex-direction:column;gap:9px;margin-bottom:0;overflow:hidden;max-height:0;opacity:0;margin-top:0;transition:max-height .45s cubic-bezier(.16,1,.3,1),opacity .35s ease,margin .35s ease;}
+  .cat-cards.expanded{max-height:4000px;opacity:1;margin-top:9px;}
   .cat-card-wrap{position:relative;border-radius:18px;overflow:hidden;}
   .cat-card-action{position:absolute;right:0;top:0;bottom:0;width:72px;background:var(--accent1);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;border-radius:0 18px 18px 0;}
   .cat-card-action svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
@@ -1159,8 +1159,8 @@ function buildDash(){
     container.appendChild(wrap);
     if(!past)initSwipe(wrap,cat);
   });
-  // Sync visual state after rebuild (opacity was never changed to 1)
-  if(catsExpanded){container.style.height=container.scrollHeight+'px';container.style.marginTop='8px';}
+  // Sync expanded state after rebuild
+  document.getElementById('dashCats').classList.toggle('expanded',catsExpanded);
 
   // expense list (tab spese)
   renderExpenseList(monthExp);
@@ -1340,19 +1340,7 @@ function confirmCloseMonth(){
 // ── COLLAPSIBLE CATS ──
 function toggleCats(){
   catsExpanded=!catsExpanded;
-  const el=document.getElementById('dashCats');
-  if(catsExpanded){
-    el.classList.add('expanded');
-    el.style.height=el.scrollHeight+'px';
-    el.style.marginTop='8px';
-  } else {
-    el.style.height=el.scrollHeight+'px';
-    el.style.marginTop='0';
-    requestAnimationFrame(()=>{
-      el.style.height='0px';
-      el.classList.remove('expanded');
-    });
-  }
+  document.getElementById('dashCats').classList.toggle('expanded',catsExpanded);
   const btn=document.getElementById('catsToggleBtn');
   btn.classList.toggle('open',catsExpanded);
   btn.querySelector('.cats-collapse-label').textContent=catsExpanded?'Comprimi':'Vedi tutte';
