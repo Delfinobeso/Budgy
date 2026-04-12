@@ -135,7 +135,7 @@
 
   /* DASHBOARD */
   #dashScreen{justify-content:flex-start;overflow-y:auto;overflow-x:hidden;padding:0;-webkit-overflow-scrolling:touch;background:var(--bg);}
-  #dashScreen::after{content:'';position:fixed;bottom:0;left:0;right:0;height:calc(env(safe-area-inset-bottom,0px) / 2 + 8px);background:linear-gradient(to bottom,transparent 0%,var(--bg) 100%);pointer-events:none;z-index:99;}
+  #dashScreen::after{content:none;}
   .dash-inner{width:100%;max-width:480px;padding:calc(env(safe-area-inset-top,0px) + 16px) 18px calc(env(safe-area-inset-bottom,0px) + 72px);}
   .dash-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
   .dash-logo{font-family:var(--font);font-weight:700;font-size:1.65rem;letter-spacing:-.3px;display:flex;align-items:center;gap:9px;}
@@ -255,8 +255,8 @@
   .exp-del svg{width:15px;height:15px;stroke:var(--red);fill:none;stroke-width:2;stroke-linecap:round;}
 
   /* FAB */
-  .fab{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:50%;translate:-50% 0;width:56px;height:56px;border-radius:18px;background:var(--accent1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px var(--shadow);transform:scale(1);opacity:1;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .2s ease;z-index:100;}
-  .fab svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .fab{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:50%;translate:-50% 0;width:64px;height:64px;border-radius:50%;background:var(--accent1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px var(--shadow),0 1px 4px rgba(0,0,0,.3);transform:scale(1);opacity:1;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .2s ease;z-index:100;}
+  .fab svg{width:28px;height:28px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
   .fab:active{transform:scale(.88);}
   .fab.hidden{transform:scale(0.6);opacity:0;pointer-events:none;}
 
