@@ -1,4 +1,4 @@
-const CACHE = 'budgy-v11';
+const CACHE = 'budgy-v12';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {

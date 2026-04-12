@@ -2,7 +2,7 @@
 <html lang="it" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Budgy</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -44,7 +44,7 @@
 
 
 
-  .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(var(--sat,0px) + 16px) 24px calc(var(--sab,0px) + 16px);transition:opacity .35s,transform .35s;}
+  .screen{position:fixed;inset:0;height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(var(--sat,0px) + 16px) 24px calc(var(--sab,0px) + 16px);transition:opacity .35s,transform .35s;}
   .screen.hidden{opacity:0;pointer-events:none;transform:translateY(24px);}
   .screen.slide-out{opacity:0;pointer-events:none;transform:translateX(-40px);}
 
