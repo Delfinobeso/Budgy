@@ -1206,9 +1206,6 @@ function renderExpenseListHome(list){
     more.onclick=function(){switchTab('spese');};
     el.appendChild(more);
   }
-  const spacer = document.createElement('div');
-  spacer.style.height = '40px';
-  el.appendChild(spacer);
 }
 
 // ── EXPENSE LIST ──
@@ -1229,9 +1226,6 @@ function renderExpenseList(list){
     el.appendChild(wrap2);
     initExpSwipe(wrap2, exp.id, past);
   });
-  const spacer = document.createElement('div');
-  spacer.style.height = '40px';
-  el.appendChild(spacer);
 }
 
 // ── SAVINGS PANEL ──
